@@ -3,13 +3,14 @@ name: Build "turnip"
 on:
   workflow_dispatch:
   schedule:
-  - cron: "5 0-23 * * *"
+  - cron: '30 0-23 * * *'
 
 jobs:
   start_building_turnip:
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
+      with: { ref: alpha }
 
     - name: Prepare environment
       run: |
