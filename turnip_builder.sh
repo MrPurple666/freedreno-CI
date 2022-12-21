@@ -109,7 +109,7 @@ cat <<EOF >"meta.json"
   "name": "Mesa Turnip Adreno Driver 23.0.0",
   "description": "Open-source Vulkan driver build from mesa drivers repo",
   "author": "Mr_Purple_666",
-  "packageVersion": "T-Alpha",
+  "packageVersion": "R-Stable",
   "vendor": "Mesa",
   "driverVersion": "23.0.0-devel",
   "minApi": 30,
@@ -124,8 +124,8 @@ cp $workdir/vulkan.adreno.so $driverdir
 
 
 echo "Packing files in to magisk module ..." $'\n'
-zip -r $workdir/turnip-23.0.0-T-Alpha_MrPurple.adpkg.zip * &> /dev/null
-if ! [ -a $workdir/turnip-23.0.0-T-Alpha_MrPurple.adpkg.zip ];
+zip -r $workdir/turnip-23.0.0-R-Stable_MrPurple.adpkg.zip * &> /dev/null
+if ! [ -a $workdir/turnip-23.0.0-R-Stable_MrPurple.adpkg.zip ];
 	then echo -e "$red-Packing failed!$nocolor" && exit 1
 	else echo -e "$green-All done, you can take your module from here;$nocolor" && echo $workdir/turnip-23.0.0-T-Alpha_MrPurple.adpkg.zip
 fi

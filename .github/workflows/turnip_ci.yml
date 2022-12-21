@@ -1,9 +1,7 @@
-name: Build "turnip"
+name: Build Driver
 
 on:
   workflow_dispatch:
-  schedule:
-  - cron: "50 * * * *"
 
 jobs:
   start_building_turnip:
@@ -20,8 +18,11 @@ jobs:
     - name: Execute build script
       run: bash ./turnip_builder.sh
 
-    - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v3.1.0
+    - name: Release Turnip driver
+      uses: softprops/action-gh-release@v1
       with:
-        name: turnip-23.0.0-T-Alpha_MrPurple.adpkg.zip
-        path: turnip_workdir/turnip-23.0.0-T-Alpha_MrPurple.adpkg.zip
+        body: Turnip Driver
+        tag_name: workflow_${{github.run_number}}
+        name: Turnip_R${{github.run_number}}
+        files: |
+           turnip_workdir/turnip-23.0.0-R-Stable_MrPurple.adpkg.zip
