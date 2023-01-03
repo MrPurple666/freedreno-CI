@@ -86,6 +86,9 @@ ninja -C build-android-aarch64 &> $workdir/ninja_log
 
 echo "Using patchelf to match soname ..."  $'\n'
 cp $workdir/mesa-main/build-android-aarch64/src/freedreno/vulkan/libvulkan_freedreno.so $workdir
+cp $workdir/mesa-main/build-android-aarch64/src/android_stub/libhardware.so $workdir
+cp $workdir/mesa-main/build-android-aarch64/src/android_stub/libsync.so $workdir
+cp $workdir/mesa-main/build-android-aarch64/src/android_stub/libbacktrace.so $workdir
 cd $workdir
 patchelf --set-soname vulkan.adreno.so libvulkan_freedreno.so
 mv libvulkan_freedreno.so vulkan.adreno.so
@@ -120,6 +123,9 @@ EOF
 
 echo "Copy necessary files from work directory ..." $'\n'
 cp $workdir/vulkan.adreno.so $driverdir
+cp $workdir/libhardware.so $driverdir
+cp $workdir/libsync.so $driverdir
+cp $workdir/libbacktrace.so $driverdir
 
 
 
