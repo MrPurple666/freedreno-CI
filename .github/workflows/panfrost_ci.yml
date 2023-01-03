@@ -1,0 +1,27 @@
+name: Build "panfrost"
+
+on:
+  workflow_dispatch:
+  schedule:
+  - cron: '30 0-23 * * *'
+
+jobs:
+  start_building_panfrost:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Prepare environment
+      run: |
+        sudo sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list
+        sudo apt update && sudo apt upgrade
+        sudo apt build-dep mesa -y
+    
+    - name: Execute build script
+      run: bash ./turnip_builder.sh
+
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v3.1.0
+      with:
+        name: panfrost-23.0.0-P-Alpha_MrPurple.adpkg.zip
+        path: turnip_workdir/panfrost-23.0.0-P-Alpha_MrPurple.adpkg.zip
