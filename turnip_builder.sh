@@ -46,11 +46,11 @@ unzip android-ndk-r25b-linux.zip  &> /dev/null
 
 
 echo "Downloading mesa source (~30 MB) ..." $'\n'
-curl https://gitlab.freedesktop.org/mesa/mesa/-/archive/main/mesa-main.zip --output mesa-main.zip &> /dev/null
+curl https://gitlab.freedesktop.org/mesa/mesa/-/archive/staging/22.3/mesa-staging-22.3.zip --output mesa-main.zip &> /dev/null
 ###
 echo "Exracting mesa source to a folder ..." $'\n'
 unzip mesa-main.zip &> /dev/null
-cd mesa-main
+cd mesa-staging-22.3
 
 
 
@@ -75,7 +75,7 @@ EOF
 
 
 echo "Generating build files ..." $'\n'
-meson build-android-aarch64 --cross-file $workdir/mesa-main/android-aarch64 -Dbuildtype=release -Dplatforms=android -Dplatform-sdk-version=31 -Dandroid-stub=true -Dgallium-drivers= -Dvulkan-drivers=freedreno -Dfreedreno-kgsl=true -Db_lto=true &> $workdir/meson_log
+meson build-android-aarch64 --cross-file $workdir/mesa-staging-22.3/android-aarch64 -Dbuildtype=release -Dplatforms=android -Dplatform-sdk-version=31 -Dandroid-stub=true -Dgallium-drivers= -Dvulkan-drivers=freedreno -Dfreedreno-kgsl=true -Db_lto=true &> $workdir/meson_log
 
 
 
@@ -85,10 +85,10 @@ ninja -C build-android-aarch64 &> $workdir/ninja_log
 
 
 echo "Using patchelf to match soname ..."  $'\n'
-cp $workdir/mesa-main/build-android-aarch64/src/freedreno/vulkan/libvulkan_freedreno.so $workdir
-cp $workdir/mesa-main/build-android-aarch64/src/android_stub/libhardware.so $workdir
-cp $workdir/mesa-main/build-android-aarch64/src/android_stub/libsync.so $workdir
-cp $workdir/mesa-main/build-android-aarch64/src/android_stub/libbacktrace.so $workdir
+cp $workdir/mesa-staging-22.3/build-android-aarch64/src/freedreno/vulkan/libvulkan_freedreno.so $workdir
+cp $workdir/mesa-staging-22.3/build-android-aarch64/src/android_stub/libhardware.so $workdir
+cp $workdir/mesa-staging-22.3/build-android-aarch64/src/android_stub/libsync.so $workdir
+cp $workdir/mesa-staging-22.3/build-android-aarch64/src/android_stub/libbacktrace.so $workdir
 cd $workdir
 patchelf --set-soname vulkan.adreno.so libvulkan_freedreno.so
 mv libvulkan_freedreno.so vulkan.adreno.so
