@@ -5,6 +5,7 @@ nocolor='\033[0m'
 deps="meson ninja patchelf unzip curl pip flex bison zip"
 workdir="$(pwd)/turnip_workdir"
 driverdir="$workdir/turnip_module"
+ndkver="android-ndk-r25c"
 clear
 
 
@@ -38,15 +39,15 @@ mkdir -p $workdir && cd $workdir
 
 
 echo "Downloading android-ndk from google server (~506 MB) ..." $'\n'
-curl https://dl.google.com/android/repository/android-ndk-r25b-linux.zip --output android-ndk-r25b-linux.zip &> /dev/null
+curl https://dl.google.com/android/repository/"$ndkver"-linux.zip --output "$ndkver"-linux.zip &> /dev/null
 ###
 echo "Exracting android-ndk to a folder ..." $'\n'
-unzip android-ndk-r25b-linux.zip  &> /dev/null
+unzip "$ndkver"-linux.zip  &> /dev/null
 
 
 
 echo "Downloading mesa source (~30 MB) ..." $'\n'
-curl https://gitlab.freedesktop.org/mesa/mesa/-/archive/main/mesa-main.zip --output mesa-main.zip &> /dev/null
+curl https://gitlab.freedesktop.org/MrPurple666/mesa/-/archive/main/mesa-main.zip --output mesa-main.zip &> /dev/null
 ###
 echo "Exracting mesa source to a folder ..." $'\n'
 unzip mesa-main.zip &> /dev/null
@@ -55,7 +56,7 @@ cd mesa-main
 
 
 echo "Creating meson cross file ..." $'\n'
-ndk="$workdir/android-ndk-r25b/toolchains/llvm/prebuilt/linux-x86_64/bin"
+ndk="$workdir/$ndkver/toolchains/llvm/prebuilt/linux-x86_64/bin"
 cat <<EOF >"android-aarch64"
 [binaries]
 ar = '$ndk/llvm-ar'
@@ -75,7 +76,7 @@ EOF
 
 
 echo "Generating build files ..." $'\n'
-meson build-android-aarch64 --cross-file $workdir/mesa-main/android-aarch64 -Dbuildtype=release -Dplatforms=android -Dplatform-sdk-version=31 -Dandroid-stub=true -Dgallium-drivers= -Dvulkan-drivers=freedreno -Dfreedreno-kgsl=true -Db_lto=true &> $workdir/meson_log
+meson build-android-aarch64 --cross-file $workdir/mesa-main/android-aarch64 -Dbuildtype=release -Dplatforms=android -Dplatform-sdk-version=31 -Dandroid-stub=true -Dgallium-drivers= -Dvulkan-drivers=freedreno -Dfreedreno-kmds=kgsl -Db_lto=true &> $workdir/meson_log
 
 
 
