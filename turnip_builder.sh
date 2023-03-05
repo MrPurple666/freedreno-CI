@@ -46,7 +46,7 @@ unzip android-ndk-r25b-linux.zip  &> /dev/null
 
 
 echo "Downloading mesa source (~30 MB) ..." $'\n'
-curl https://gitlab.freedesktop.org/MrPurple666/mesa/-/archive/main/mesa-main.zip --output mesa-main.zip &> /dev/null
+curl https://gitlab.freedesktop.org/mesa/mesa/-/archive/main/mesa-main.zip --output mesa-main.zip &> /dev/null
 ###
 echo "Exracting mesa source to a folder ..." $'\n'
 unzip mesa-main.zip &> /dev/null
