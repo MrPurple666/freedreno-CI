@@ -24,5 +24,5 @@ jobs:
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v3.1.0
       with:
-        name: turnip-23.0.0-T-Alpha_MrPurple.adpkg.zip
-        path: turnip_workdir/turnip-23.0.0-T-Alpha_MrPurple.adpkg.zip
+        name: turnip-23.2.0-T-Alpha_MrPurple.adpkg.zip
+        path: turnip_workdir/turnip-23.2.0-T-Alpha_MrPurple.adpkg.zip
