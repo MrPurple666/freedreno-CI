@@ -47,11 +47,11 @@ unzip "$ndkver"-linux.zip  &> /dev/null
 
 
 echo "Downloading mesa source (~30 MB) ..." $'\n'
-curl https://gitlab.freedesktop.org/Danil/mesa/-/archive/freedreno/feature/a610/mesa-freedreno-feature-a610.zip --output mesa-main.zip &> /dev/null
+curl https://gitlab.freedesktop.org/Danil/mesa/-/archive/turnip/feature/a7xx-basic-support/mesa-turnip-feature-a7xx-basic-support.zip --output mesa-main.zip &> /dev/null
 ###
 echo "Exracting mesa source to a folder ..." $'\n'
 unzip mesa-main.zip &> /dev/null
-cd mesa-freedreno-feature-a610
+cd mesa-turnip-feature-a7xx-basic-support
 
 
 
@@ -76,7 +76,7 @@ EOF
 
 
 echo "Generating build files ..." $'\n'
-meson build-android-aarch64 --cross-file $workdir/mesa-freedreno-feature-a610/android-aarch64 -Dbuildtype=release -Dplatforms=android -Dplatform-sdk-version=31 -Dandroid-stub=true -Dgallium-drivers= -Dvulkan-drivers=freedreno -Dfreedreno-kmds=kgsl -Db_lto=true &> $workdir/meson_log
+meson build-android-aarch64 --cross-file $workdir/mesa-turnip-feature-a7xx-basic-support/android-aarch64 -Dbuildtype=release -Dplatforms=android -Dplatform-sdk-version=31 -Dandroid-stub=true -Dgallium-drivers= -Dvulkan-drivers=freedreno -Dfreedreno-kmds=kgsl -Db_lto=true &> $workdir/meson_log
 
 
 
@@ -86,10 +86,10 @@ ninja -C build-android-aarch64 &> $workdir/ninja_log
 
 
 echo "Using patchelf to match soname ..."  $'\n'
-cp $workdir/mesa-freedreno-feature-a610/build-android-aarch64/src/freedreno/vulkan/libvulkan_freedreno.so $workdir
-cp $workdir/mesa-freedreno-feature-a610/build-android-aarch64/src/android_stub/libhardware.so $workdir
-cp $workdir/mesa-freedreno-feature-a610/build-android-aarch64/src/android_stub/libsync.so $workdir
-cp $workdir/mesa-freedreno-feature-a610/build-android-aarch64/src/android_stub/libbacktrace.so $workdir
+cp $workdir/mesa-turnip-feature-a7xx-basic-support/build-android-aarch64/src/freedreno/vulkan/libvulkan_freedreno.so $workdir
+cp $workdir/mesa-turnip-feature-a7xx-basic-support/build-android-aarch64/src/android_stub/libhardware.so $workdir
+cp $workdir/mesa-turnip-feature-a7xx-basic-support/build-android-aarch64/src/android_stub/libsync.so $workdir
+cp $workdir/mesa-turnip-feature-a7xx-basic-support/build-android-aarch64/src/android_stub/libbacktrace.so $workdir
 cd $workdir
 patchelf --set-soname vulkan.adreno.so libvulkan_freedreno.so
 mv libvulkan_freedreno.so vulkan.adreno.so
@@ -110,12 +110,12 @@ cd $driverdir
 cat <<EOF >"meta.json"
 {
   "schemaVersion": 1,
-  "name": "Mesa Turnip Adreno Driver 23.2.0 for A610",
+  "name": "Mesa Turnip Adreno Driver 23.2.0 for A7xx",
   "description": "Open-source Vulkan driver build from Danylo Piliaiev  drivers repo",
-  "author": "Mr_Purple_666 & IIya114",
+  "author": "Mr_Purple_666",
   "packageVersion": "T-Alpha",
   "vendor": "Mesa",
-  "driverVersion": "23.2.0-devel_A610",
+  "driverVersion": "23.2.0-devel_A7xx",
   "minApi": 30,
   "libraryName": "vulkan.adreno.so"
 }
@@ -131,8 +131,8 @@ cp $workdir/libbacktrace.so $driverdir
 
 
 echo "Packing files in to magisk module ..." $'\n'
-zip -r $workdir/turnip-23.2.0_A610-T-Alpha_MrPurple_IIya114.adpkg.zip * &> /dev/null
-if ! [ -a $workdir/turnip-23.2.0_A610-T-Alpha_MrPurple_IIya114.adpkg.zip ];
+zip -r $workdir/turnip-23.2.0_A7xx-T-Alpha_MrPurple.adpkg.zip * &> /dev/null
+if ! [ -a $workdir/turnip-23.2.0_A7xx-T-Alpha_MrPurple.adpkg.zip ];
 	then echo -e "$red-Packing failed!$nocolor" && exit 1
-	else echo -e "$green-All done, you can take your module from here;$nocolor" && echo  $workdir/turnip-23.2.0_A610-T-Alpha_MrPurple_IIya114.adpkg.zip
+	else echo -e "$green-All done, you can take your module from here;$nocolor" && echo  $workdir/turnip-23.2.0_A7xx-T-Alpha_MrPurple.adpkg.zip
 fi
