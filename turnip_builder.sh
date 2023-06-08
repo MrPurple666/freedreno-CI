@@ -76,7 +76,7 @@ EOF
 
 
 echo "Generating build files ..." $'\n'
-meson build-android-aarch64 --cross-file $workdir/mesa-turnip-feature-a7xx-basic-support/android-aarch64 -Dbuildtype=release -Dplatforms=android -Dplatform-sdk-version=31 -Dandroid-stub=true -Dgallium-drivers= -Dvulkan-drivers=freedreno -Dfreedreno-kmds=kgsl -Db_lto=true &> $workdir/meson_log
+meson build-android-aarch64 --cross-file meson build -Dplatforms=x11 -Dgallium-drivers= -Dvulkan-drivers=freedreno -Ddri3=enabled -Dgles2=enabled -Dglvnd=true -Dglx=dri -Dgles1=enabled -Dfreedreno-kmds=kgsl -Dbuildtype=release  &> $workdir/meson_log
 
 
 
