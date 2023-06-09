@@ -51,8 +51,8 @@ jobs:
           ###
           echo "Exracting mesa source to a folder ..." $'\n'
           unzip mesa-main.zip &> /dev/null
+          bash android-cross-file-gen.sh
           cd mesa-main
-          ln -s vulkan_android.pc vulkan.pc
           sudo apt update
           sudo apt install -y meson libxrandr-dev libxxf86vm-dev libxcb-*-dev libx11-xcb-dev libxfixes-dev libdrm-dev libx11-dev
           cp -R /usr/include/X11 include/
@@ -67,7 +67,7 @@ jobs:
           elif [ "${{matrix.arch}}" == "x86_64" ]; then
             export ANDROID_TARGET=x86_64-linux-android
           fi
-          bash android-cross-file-gen.sh
+          
           # -Dglx=gallium-xlib \
           meson "build-android-${{matrix.arch}}" \
             --prefix=/tmp/mesa \
