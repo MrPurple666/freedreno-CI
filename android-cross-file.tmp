@@ -1,0 +1,22 @@
+[binaries]
+ar = '$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar'
+c = ['ccache', '$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin/${ANDROID_TARGET}26-clang', '-O3', '-DVK_USE_PLATFORM_ANDROID_KHR', '-fPIC']
+cpp = ['ccache', '$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin/${ANDROID_TARGET}26-clang++', '-O3', '-DVK_USE_PLATFORM_ANDROID_KHR', '-fPIC', '-fno-exceptions', '-fno-unwind-tables', '-fno-asynchronous-unwind-tables', '-static-libstdc++']
+c_ld = 'lld'
+cpp_ld = 'lld'
+strip = '$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin/${ANDROID_TARGET}26-strip'
+# Android doesn't come with a pkg-config, but we need one for meson to be happy not
+# finding all the optional deps it looks for.  Use system pkg-config pointing at a
+# directory we get to populate with any .pc files we want to add for Android
+pkgconfig = ['env', 'PKG_CONFIG_LIBDIR=.', '/usr/bin/pkg-config']
+
+[host_machine]
+system = 'linux'
+# cpu_family = 'x86_64'
+# cpu = 'amd64'
+
+# ik this is wrong but workaround sanity check
+cpu_family = 'arm'
+cpu = 'armv8'
+
+endian = 'little'
