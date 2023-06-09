@@ -1,0 +1,4 @@
+Name: vulkan
+Description: Android Vulkan library
+Version: 1.2
+Libs: -lvulkan
