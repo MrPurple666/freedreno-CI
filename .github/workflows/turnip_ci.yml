@@ -32,13 +32,13 @@ jobs:
           pip install mako &> /dev/null
           
           ln -s vulkan_android.pc vulkan.pc
+          bash android-cross-file-gen.sh
+
 
 
 
           echo "Creating and entering to work directory ..." $'\n'
           mkdir -p $workdir && cd $workdir
-          bash android-cross-file-gen.sh
-
 
 
           echo "Downloading android-ndk from google server (~506 MB) ..." $'\n'
