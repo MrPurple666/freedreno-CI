@@ -1,28 +1,92 @@
-name: Build "turnip"
+
+name: Build Android
 
 on:
-  workflow_dispatch:
- # schedule:
- # - cron: '30 0-23 * * *'
+  [push, pull_request]
 
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  start_building_turnip:
+  build:
+    strategy:
+      matrix:
+        arch: [ "arm32", "aarch64", "x86_64" ]
+      fail-fast: false
+
+    name: "Build for ${{matrix.arch}}"
+
     runs-on: ubuntu-22.04
+
     steps:
-    - uses: actions/checkout@v3
-      with: { ref: alpha }
+      - uses: actions/checkout@v2
 
-    - name: Prepare environment
-      run: |
-        sudo sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list
-        sudo apt update
-        sudo apt build-dep mesa -y
-    
-    - name: Execute build script
-      run: bash ./turnip_builder.sh
+      - name: Build
+        run: |
+          green='\033[0;32m'
+          red='\033[0;31m'
+          nocolor='\033[0m'
+          deps="meson ninja patchelf unzip curl pip flex bison zip"
+          workdir="$(pwd)/turnip_workdir"
+          driverdir="$workdir/turnip_module"
+          ndkver="android-ndk-r25c"
+          echo "Installing python Mako dependency (if missing) ..." $'\n'
+          pip install mako &> /dev/null
 
-    - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v3.1.0
-      with:
-        name: turnip-23.2.0-T-Alpha_MrPurple.adpkg.zip
-        path: turnip_workdir/turnip-23.2.0-T-Alpha_MrPurple.adpkg.zip
+
+
+          echo "Creating and entering to work directory ..." $'\n'
+          mkdir -p $workdir && cd $workdir
+
+
+
+          echo "Downloading android-ndk from google server (~506 MB) ..." $'\n'
+          curl https://dl.google.com/android/repository/"$ndkver"-linux.zip --output "$ndkver"-linux.zip &> /dev/null
+          ###
+          echo "Exracting android-ndk to a folder ..." $'\n'
+          unzip "$ndkver"-linux.zip  &> /dev/null
+
+
+
+          echo "Downloading mesa source (~30 MB) ..." $'\n'
+          curl https://gitlab.freedesktop.org/mesa/mesa/-/archive/main/mesa-main.zip --output mesa-main.zip &> /dev/null
+          ###
+          echo "Exracting mesa source to a folder ..." $'\n'
+          unzip mesa-main.zip &> /dev/null
+          cd mesa-main
+          ln -s vulkan_android.pc vulkan.pc
+          sudo apt update
+          sudo apt install -y meson libxrandr-dev libxxf86vm-dev libxcb-*-dev libx11-xcb-dev libxfixes-dev libdrm-dev libx11-dev
+          cp -R /usr/include/X11 include/
+          cp -R /usr/include/xcb include/
+          cp -R /usr/include/GL/* include/GL/
+          pip3 install mako
+          #
+          if [ "${{matrix.arch}}" == "arm32" ]; then
+            export ANDROID_TARGET=armv7a-linux-androideabi
+          elif [ "${{matrix.arch}}" == "aarch64" ]; then
+            export ANDROID_TARGET=aarch64-linux-android
+          elif [ "${{matrix.arch}}" == "x86_64" ]; then
+            export ANDROID_TARGET=x86_64-linux-android
+          fi
+          bash android-cross-file-gen.sh
+          # -Dglx=gallium-xlib \
+          meson "build-android-${{matrix.arch}}" \
+            --prefix=/tmp/mesa \
+            --cross-file "/tmp/generated-cross-file" \
+            -Dbuildtype=release -Dplatforms=android -Dplatform-sdk-version=31 -Dandroid-stub=true -Dgallium-drivers= -Dvulkan-drivers=freedreno -Dfreedreno-kmds=kgsl -Db_lto=true &> $workdir/meson_log
+          ninja -C "build-android-${{matrix.arch}}" install
+          cp "$workdir/mesa-main/build-android-${{matrix.arch}}/src/freedreno/vulkan/libvulkan_freedreno.so" /tmp/mesa/lib/
+          cp "$workdir/mesa-main/build-android-${{matrix.arch}}/src/android_stub/libhardware.so" /tmp/mesa/lib
+          cp "$workdir/mesa-main/build-android-${{matrix.arch}}/src/android_stub/libsync.so" /tmp/mesa/lib
+          cp "$workdir/mesa-main/build-android-${{matrix.arch}}/src/android_stub/libbacktrace.so" /tmp/mesa/lib
+          # cp "build-android-${{matrix.arch}}/src/gallium/drivers/mesa/libzinkk.a" /tmp/mesa/lib/
+          rm /tmp/mesa/lib/libOSMesa.so /tmp/mesa/lib/libOSMesa.so.8
+          mv /tmp/mesa/lib/libOSMesa.so.8.0.0 /tmp/mesa/lib/libOSMesa.so.8
+          mv /tmp/mesa/lib/libOSMesa.so.8 /tmp/mesa/lib/libOSMesa_unstripped.so.8
+          # $ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin/${ANDROID_TARGET}-strip /tmp/mesa/lib/libOSMesa.so.8
+          # mv /tmp/mesa/lib/libOSMesa.so.8 /tmp/mesa/lib/libOSMesa_8.so
+      - name: Upload libraries
+        uses: actions/upload-artifact@v2
+        with:
+          name: libmesa_${{matrix.arch}}
+          path: /tmp/mesa
+
